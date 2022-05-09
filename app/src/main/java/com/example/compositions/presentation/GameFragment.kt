@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.example.compositions.R
 import com.example.compositions.databinding.FragmentGameBinding
 import com.example.compositions.domain.entity.GameResult
@@ -16,6 +17,7 @@ import java.lang.RuntimeException
 class GameFragment : Fragment() {
 
     private lateinit var level: Level
+    private lateinit var viewModel: GameViewModel
 
     private var _binding: FragmentGameBinding? = null
     private val binding: FragmentGameBinding
@@ -24,6 +26,7 @@ class GameFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         parseLevel()
+        viewModel = ViewModelProvider(this)[GameViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -37,16 +40,6 @@ class GameFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.tvSum.setOnClickListener {
-            launchGameFragment(
-                GameResult(
-                    true,
-                    3,
-                    4,
-                    GameSettings(0, 0, 0, 0)
-                )
-            )
-        }
     }
 
     override fun onDestroyView() {

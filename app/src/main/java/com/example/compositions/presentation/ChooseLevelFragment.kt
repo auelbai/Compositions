@@ -52,10 +52,4 @@ class ChooseLevelFragment : Fragment() {
             ChooseLevelFragmentDirections.actionChooseLevelFragmentToGameFragment(level)
         )
     }
-
-    companion object{
-        fun newInstance() : ChooseLevelFragment {
-            return ChooseLevelFragment()
-        }
-    }
 }

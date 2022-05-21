@@ -9,7 +9,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.compositions.R
 import com.example.compositions.databinding.FragmentGameBinding
 import com.example.compositions.domain.entity.GameResult
@@ -18,12 +19,12 @@ import java.lang.RuntimeException
 
 class GameFragment : Fragment() {
 
-    private lateinit var level: Level
+    private val args by navArgs<GameFragmentArgs>()
 
     private val viewModel: GameViewModel by lazy {
         ViewModelProvider(
             this,
-            GameViewModelFactory(requireActivity().application, level)
+            GameViewModelFactory(requireActivity().application, args.level)
         ).get(GameViewModel::class.java)
     }
 
@@ -41,12 +42,6 @@ class GameFragment : Fragment() {
     private var _binding: FragmentGameBinding? = null
     private val binding: FragmentGameBinding
         get() = _binding ?: throw RuntimeException("FragmentGameBinding == null")
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        parseLevel()
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -102,7 +97,7 @@ class GameFragment : Fragment() {
         }
 
         viewModel.gameResult.observe(viewLifecycleOwner) {
-            launchGameFragment(it)
+            launchGameFinishFragment(it)
         }
 
         viewModel.progressAnswers.observe(viewLifecycleOwner) {
@@ -124,23 +119,16 @@ class GameFragment : Fragment() {
         _binding = null
     }
 
-    private fun parseLevel() {
-        requireArguments().getParcelable<Level>(KEY_LEVEL)?.let {
-            level = it
-        }
-    }
-
-    private fun launchGameFragment(gameResult: GameResult) {
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.main_container, GameFinishedFragment.newInstance(gameResult))
-            .addToBackStack(null)
-            .commit()
+    private fun launchGameFinishFragment(gameResult: GameResult) {
+        findNavController().navigate(
+            GameFragmentDirections.actionGameFragmentToGameFinishedFragment(gameResult)
+        )
     }
 
     companion object {
 
         const val NAME = "GameFragment"
-        private const val KEY_LEVEL = "level"
+        const val KEY_LEVEL = "level"
 
         fun newInstance(level: Level): GameFragment {
             return GameFragment().apply {

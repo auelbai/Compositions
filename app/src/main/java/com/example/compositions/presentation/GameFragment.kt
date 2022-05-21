@@ -23,8 +23,8 @@ class GameFragment : Fragment() {
     private val viewModel: GameViewModel by lazy {
         ViewModelProvider(
             this,
-            AndroidViewModelFactory.getInstance(requireActivity().application))
-            .get(GameViewModel::class.java)
+            GameViewModelFactory(requireActivity().application, level)
+        ).get(GameViewModel::class.java)
     }
 
     private val tvOptions by lazy {
@@ -59,7 +59,6 @@ class GameFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.startGame(level)
         observeViewModel()
         clickListenerForOptions()
 

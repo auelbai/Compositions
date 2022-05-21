@@ -15,15 +15,16 @@ import com.example.compositions.domain.entity.Question
 import com.example.compositions.domain.useCase.GenerateQuestionUseCase
 import com.example.compositions.domain.useCase.GetGameSettingsUseCase
 
-class GameViewModel(application: Application) : AndroidViewModel(application) {
+class GameViewModel(
+    private val application: Application,
+    private val level: Level
+) : ViewModel() {
 
     private val repository = GameRepositoryImpl
-    private val context = application
 
     private val generateQuestionUseCase = GenerateQuestionUseCase(repository)
     private val getGameSettingsUseCase = GetGameSettingsUseCase(repository)
 
-    private lateinit var level: Level
     private lateinit var gameSettings: GameSettings
 
     private var timer: CountDownTimer? = null
@@ -63,8 +64,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     val gameResult: LiveData<GameResult>
         get() = _gameResult
 
-    fun startGame(level: Level) {
-        getGameSettings(level)
+    init {
+        startGame()
+    }
+
+    private fun startGame() {
+        getGameSettings()
         startTimer()
         generateQuestion()
         updateProgress()
@@ -80,7 +85,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val percent = calculateOfRightAnswers()
         _percentOfRightAnswers.value = percent
         _progressAnswers.value = String.format(
-            context.resources.getString(R.string.progress_answers),
+            application.resources.getString(R.string.progress_answers),
             countOfRightAnswers,
             gameSettings.minCountOfRightAnswers
         )
@@ -107,8 +112,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         countOfQuestion++
     }
 
-    private fun getGameSettings(level: Level) {
-        this.level = level
+    private fun getGameSettings() {
         this.gameSettings = getGameSettingsUseCase.invoke(level)
         _minPercent.value = gameSettings.minPercentOfRightAnswers
     }
